@@ -5,84 +5,113 @@
 #include <stdio.h>
 #include <assert.h>
 
-static inline
+	static inline
 void normalize(double *v)
 {
-    double d = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-    assert(d != 0.0 && "Error calculating normal");
+	double d = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+	assert(d != 0.0 && "Error calculating normal");//assert !!? what's this!!?
 
-    v[0] /= d;
-    v[1] /= d;
-    v[2] /= d;
+	v[0] /= d;
+	v[1] /= d;
+	v[2] /= d;
 }
 
-static inline
+	static inline
 double length(const double *v)
 {
-    return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 }
-
-static inline
+// using the loop unrolling to optimize the add_vector
+	static inline
 void add_vector(const double *a, const double *b, double *out)
 {
-    for (int i = 0; i < 3; i++)
-        out[i] = a[i] + b[i];
+	//source code
+	/* 
+	for (int i = 0; i < 3; i++)
+	{
+		out[i] = a[i] + b[i];
+	}
+	*/
+	out[0] = a[0] + b[0];
+	out[1] = a[1] + b[1];
+	out[2] = a[2] + b[2];			
 }
-
-static inline
+// using the loop unrolling to optimize the subtract_vector
+	static inline
 void subtract_vector(const double *a, const double *b, double *out)
 {
-    for (int i = 0; i < 3; i++)
-        out[i] = a[i] - b[i];
+	//the source code
+	/*
+	   for (int i = 0; i < 3; i++)
+
+	   out[i] = a[i] - b[i];
+	 */
+	out[0] = a[0] - b[0];
+	out[1] = a[1] - b[1];
+	out[2] = a[2] - b[2];	
 }
 
-static inline
+	static inline
 void multiply_vectors(const double *a, const double *b, double *out)
 {
-    for (int i = 0; i < 3; i++)
-        out[i] = a[i] * b[i];
+	for (int i = 0; i < 3; i++)
+		out[i] = a[i] * b[i];
 }
 
-static inline
+	static inline
 void multiply_vector(const double *a, double b, double *out)
-{
-    for (int i = 0; i < 3; i++)
-        out[i] = a[i] * b;
+{	//the source code
+	/*
+	for (int i = 0; i < 3; i++)
+		out[i] = a[i] * b;
+	*/
+	out[0] = a[0] * b;
+	out[1] = a[1] * b;
+	out[2] = a[2] * b;
 }
 
-static inline
+	static inline
 void cross_product(const double *v1, const double *v2, double *out)
 {
-    out[0] = v1[1] * v2[2] - v1[2] * v2[1];
-    out[1] = v1[2] * v2[0] - v1[0] * v2[2];
-    out[2] = v1[0] * v2[1] - v1[1] * v2[0];
+	out[0] = v1[1] * v2[2] - v1[2] * v2[1];
+	out[1] = v1[2] * v2[0] - v1[0] * v2[2];
+	out[2] = v1[0] * v2[1] - v1[1] * v2[0];
 }
-
-static inline
+// i do the loop unrolling to exand the forloop to optimize this function
+	static inline
 double dot_product(const double *v1, const double *v2)
 {	
-	// i do the loop unrolling to exand the forloop to optimize this function
-    double dp = 0.0;
-    dp += v1[0] * v2[0];
-	dp += v1[1] * v2[1];
-	dp += v1[2] * v2[2];
 
-    return dp;
+	double dp = 0.0;
+
+	dp = v1[0] * v2[0];
+	dp = v1[1] * v2[0];
+	dp = v1[0] * v2[0];
+
+
+	//(the original way of using in dot_prodcut)
+	/*
+	   for (int i = 0; i < 3; i++)
+	   {
+	   dp += v1[i] * v2[i];
+	   }
+	 */
+	return dp;
 }
-static inline
+	static inline
 void scalar_triple_product(const double *u, const double *v, const double *w,
-                           double *out)
+		double *out)
 {
-    cross_product(v, w, out);
-    multiply_vectors(u, out, out);
+	cross_product(v, w, out);
+	multiply_vectors(u, out, out);
 }
 
-static inline
+	static inline
 double scalar_triple(const double *u, const double *v, const double *w)
 {
-    double tmp[3];
-    cross_product(w, u, tmp);
-    return dot_product(v, tmp);
+	double tmp[3];
+	cross_product(w, u, tmp);
+	return dot_product(v, tmp);
 }
 
 #endif
