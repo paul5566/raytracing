@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
-
+#include <omp.h>
 #include "primitives.h"
 #include "raytracing.h"
 
